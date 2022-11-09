@@ -1,0 +1,46 @@
+A Stored Procedure is a set/series of SQL statements 
+It has some inputs
+It has some outputs
+
+We can write Stored procedure in python. 
+You can use the snowflake Snowpark library within stored procedure to perform queries, updates, and other work on tables in Snowflake.
+With Snowpark Stored Procedures, you can build and run your data pipeline within Snowflake, using a Snowflake warehouse as the compute framework. 
+You must use version 0.4.0 or a more recent version of the Snowpark library.
+Snowflake currently supports writing Stored Procedures in Python version 3.8.
+
+Setting Up Your Development Environment for Snowpark
+
+You can either create an in-line stored procedure or a stored procedure with code uploaded from a stage.
+In an in-line stored procedure, you write your Python code in the AS clause of the CREATE PROCEDURE statement.
+
+In a stored procedure created with code uploaded from a stage, you write your Python code in a .py source file. For example you could put the following code into a file called my_py_file.py
+
+You then upload the file to a stage and execute the CREATE PROCEDURE command, pointing to the file on the stage. For example:
+CREATE OR REPLACE PROCEDURE MYPROC(from_table STRING, to_table STRING, count INT)
+  RETURNS INT
+  LANGUAGE PYTHON
+  RUNTIME_VERSION = '3.8'
+  PACKAGES = ('snowflake-snowpark-python')
+  IMPORTS = ('@mystage/my_py_file.py')
+  HANDLER = 'my_py_file.run';
+
+When writing the Python Code for the Stored Procedure
+•	Limit the Amount of Memory Consumed( avoid consuming too much memory)
+•	Write Thread-Safe Code
+•	Understand the Security Restrictions
+•	Decide on Using Owner’s Rights or Caller’s Rights
+•	Be Aware of snowflake-snowpark-python Version
+
+When writing the method or function for the stored procedure
+•	Specify the Snowpark Session object as the first argument of your method or function. When you call your stored procedure, Snowflake automatically creates a Session object and passes it to your stored procedure. (You cannot create the Session object yourself.)
+•	For the rest of the arguments and for the return value, use the Python types that correspond to Snowflake data types. Snowflake supports the Python data types listed in SQL-Python Data Type Mappings for Parameters and Return Types
+The following is an example of a Python method that copies a specified number of rows from one table to another table. The method takes the following arguments:
+•	A Snowpark Session object
+•	The name of the table to copy the rows from
+•	The name of the table to save the rows to
+•	The number of rows to copy
+
+You can also display all packages available and their version information by querying the PACKAGES view in the Information Schema.
+select * from information_schema.packages where language = 'python';
+Set the CREATE PROCEDURE parameters as listed in the table below.
+
